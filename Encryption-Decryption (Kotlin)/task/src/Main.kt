@@ -4,27 +4,46 @@ import jdk.internal.joptsimple.internal.Messages.message
 
 fun main() {
 
-
-    // encryption
-    // a to b, b to c, ... z to a
-    // A to B, B to C, ... Z to A
-    // if there is a number or a space, it should be printed as is
-    val message = readln() // first line of input is the string to be encrypted
-    val key = readln().toInt() // second line of input is the key, which is an integer
-    for (i in message.indices) {
-        // shift the character by the key
-        when (val c = message[i]) {
-            in 'a'..'z' -> {
-                val shiftedChar = (((c - 'a') + key) % 26 + 'a'.code).toChar()
-                print(shiftedChar)
-            }
-            in 'A'..'Z' -> {
-                val shiftedChar = (((c - 'A') + key) % 26 + 'A'.code).toChar()
-                print(shiftedChar)
-            }
-            else -> {
-                print(c)
-            }
+    // read the input from user to decide on encryption or d
+    val operation = readln()
+    // read the message to be encrypted or decrypted
+    val message = readln()
+    // read the key for encryption or decryption
+    val key = readln().toInt()
+    // if enc then encrypt, if dec then decrypt
+    when (operation) {
+        "enc" -> {
+            encryption(message, key)
+            println() // print a new line after encryption
         }
+        "dec" -> {
+            decryption(message, key)
+            println() // print a new line after decryption
+        }
+        else -> {
+            println("Invalid operation. Please enter 'enc' for encryption or 'dec' for decryption.")
+        }
+    }
+}
+
+// Encryption function
+fun encryption(message: String, key: Int){
+    // encryption
+    // shift every character by the key
+    for (char in message){
+        // Get the Unicode value,add the key, convert back to char
+        val shiftedChar = (char.code + key).toChar()
+        print(shiftedChar)
+    }
+}
+
+// Decryption function
+fun decryption(message: String, key: Int){
+    // decryption
+    // shift every character back by the key
+    for (char in message){
+        // Get the Unicode value, subtract the key, convert back to char
+        val shiftedChar = (char.code - key).toChar()
+        print(shiftedChar)
     }
 }
