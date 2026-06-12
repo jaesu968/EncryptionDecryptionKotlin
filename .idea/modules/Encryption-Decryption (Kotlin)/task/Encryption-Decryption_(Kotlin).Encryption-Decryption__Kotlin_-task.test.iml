@@ -41,7 +41,7 @@
     <content url="file://$MODULE_DIR$/../../../../Encryption-Decryption (Kotlin)/task/test">
       <sourceFolder url="file://$MODULE_DIR$/../../../../Encryption-Decryption (Kotlin)/task/test" isTestSource="true" />
     </content>
-    <orderEntry type="jdk" jdkName="corretto-23" jdkType="JavaSDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Encryption-Decryption_(Kotlin).Encryption-Decryption__Kotlin_-task.main" />
     <orderEntry type="module" module-name="Encryption-Decryption_(Kotlin).util.main" />

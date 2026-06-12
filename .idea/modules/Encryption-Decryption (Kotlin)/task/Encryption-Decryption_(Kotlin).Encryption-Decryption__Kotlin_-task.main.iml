@@ -39,7 +39,7 @@
     <content url="file://$MODULE_DIR$/../../../../Encryption-Decryption (Kotlin)/task/src">
       <sourceFolder url="file://$MODULE_DIR$/../../../../Encryption-Decryption (Kotlin)/task/src" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="corretto-23" jdkType="JavaSDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:2.1.0" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains:annotations:13.0" level="project" />
