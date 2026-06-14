@@ -1,5 +1,5 @@
 fun main() {
-    val characters = charArrayOf('a', 'z', 'e', 'd')
+    val characters = // ...
 
     println(characters.joinToString())
 }

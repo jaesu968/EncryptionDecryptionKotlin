@@ -1,5 +1,5 @@
 fun main() {
-    val longs = longArrayOf(100_000_000_001L, 100_000_000_002L, 100_000_000_003L)
+    val longs = // ...
 
     // do not touch the lines below 
     println(longs.joinToString())
