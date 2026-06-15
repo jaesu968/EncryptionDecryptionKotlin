@@ -11,6 +11,7 @@ fun main(args: Array<String>) {
     var data: String? = null // initialize as a nullable string since it might be empty or not present.
     var inPath: String? = null // initialize this to get the file path for input if -in is present
     var outPath: String? = null // initialize this to get the file path for output if -out is present
+    var alg = "shift" // default algorithm is shift, but it can be changed to Unicode if -alg is specified.
 
     // parse arguments using a when statement to jump to the correct case for each argument.
     try {
@@ -26,6 +27,7 @@ fun main(args: Array<String>) {
                 "-data" -> data = args[i + 1]
                 "-in" -> inPath = args[i + 1]
                 "-out" -> outPath = args[i + 1]
+                "-alg" -> alg = args[i + 1]
             }
         }
     } catch (e: Exception){
@@ -46,10 +48,14 @@ fun main(args: Array<String>) {
         } else -> "" // If neither -data nor -in is provided, use an empty string as the default message.
     }
 
-    // Process Data
-    val result = when(mode){
-        "dec" -> processData(finalData, -key) // decryption is done by shifting characters in the opposite direction, hence the negative key.
-        else -> processData(finalData, key) // encryption is done by shifting characters forward using the positive key.
+    // Process Data, use alg to determine which algorithm to use for encryption/decryption, and call the appropriate function with the final data, mode, and key.
+    val result = when(alg){
+        "unicode" -> unicodeAlgorithm(finalData, mode, key) // use Unicode algorithm to shift characters based on their Unicode values.
+        "shift" -> shiftAlgorithm(finalData, mode, key) // use shift algorithm to shift only letters (both uppercase and lowercase) while leaving non-letter characters unchanged.
+        else -> {
+            println("Error: Unknown algorithm $alg")
+            return
+        }
     }
 
     // Handle Output
@@ -65,16 +71,44 @@ fun main(args: Array<String>) {
 }
 
 /**
- * Shifts each character in the message by the given key.
- * Positive key for encryption, negative key for decryption.
+ * Shifting algorithm: shifts each letter by the specific number according to its order in the alphabet.
+ * Only English letters (a-z, A-Z) are shifted, while non-letter characters remain unchanged.
  */
-fun processData(message: String, key: Int): String {
-    val result = StringBuilder() // Use StringBuilder for efficient string concatenation
-    // if key is positive, it will shift characters forward (encryption)
-    // if key is negative, it will shift characters backward (decryption)
+fun shiftAlgorithm(message: String, mode: String, key: Int): String {
+    val shiftKey = if (mode == "dec") -key else key // if mode is "dec", we negate the key to shift in the opposite direction for decryption.
+    val result = StringBuilder()  // use StringBuilder for efficient string concatenation.
+
+    // use a for loop to iterate through each character in the message and apply the appropriate shift based on whether it's an uppercase letter, lowercase letter, or non-letter character.
     for (char in message){
-        result.append((char.code + key).toChar())
+        when(char) {
+            in 'a'..'z' -> {
+                val shifted = (char - 'a' + shiftKey) % 26 // calculate the new position by adding the shift key and using modulo to wrap around the alphabet.
+                val finalChar = if (shifted < 0) shifted + 26 else shifted // if the result is negative, we add 26 to wrap around correctly.
+                result.append(('a'.code + finalChar).toChar()) // convert back to character and append to result.
+            }
+            in 'A'..'Z' -> {
+                val shifted = (char - 'A' + shiftKey) % 26 // similar logic for uppercase letters.
+                val finalChar = if (shifted < 0) shifted + 26 else shifted
+                result.append(('A'.code + finalChar).toChar()) // convert back to character and append to result.
+            }
+            else -> result.append(char) // non-letter characters are appended unchanged.
+        }
     }
-    return result.toString()
+    return result.toString() // convert StringBuilder to String and return the final result.
+}
+
+/**
+ * Unicode algorithm: shifts each character based on the Unicode table.
+ */
+fun unicodeAlgorithm(message: String, mode: String, key: Int): String {
+    val shiftKey = if (mode == "dec") -key else key // determine the shift direction based on the mode.
+    val result = StringBuilder() // use StringBuilder for efficient string concatenation.
+
+    // iterate through each character in the message, shift it by the specified key, and append the shifted character to the result.
+    for (char in message){
+        val shiftedChar = char + shiftKey // shift the character by adding the key to its Unicode value.
+        result.append(shiftedChar) // append the shifted character to the result.
+    }
+    return result.toString() // convert StringBuilder to String and return the final result.
 }
 

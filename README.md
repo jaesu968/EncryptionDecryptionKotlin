@@ -23,36 +23,98 @@ Expanded the program to support both encryption and decryption using Unicode shi
     - Shifts all characters (including symbols and spaces) based on their Unicode values.
     - Modularized code using functions for better readability.
 
+### Stage 4: I Command You
+Transitioned from standard input to **command-line arguments** for better automation and flexibility.
+- **Concept:** Command-line argument parsing.
+- **Key Features:**
+    - Supports `-mode`, `-key`, and `-data` arguments.
+    - If a parameter is missing, the program uses default values (`enc`, `0`, and empty string).
+
+### Stage 5: X-files
+Added support for **File I/O**, allowing the program to read from and write to external files.
+- **Concept:** File persistence.
+- **Key Features:**
+    - `-in` argument: Specifies the input file path to read the message from.
+    - `-out` argument: Specifies the output file path to save the result.
+    - Priority: `-data` has higher priority than `-in`.
+
+### Stage 6: Choice, choice
+Introduced multiple encryption **algorithms** and improved the project structure.
+- **Concept:** Strategy Pattern (Choice of algorithms).
+- **Key Features:**
+    - `-alg` argument: Choose between `shift` and `unicode`.
+    - **Shift Algorithm:** Shifts only English letters (a-z, A-Z) and wraps around; non-letter characters remain unchanged.
+    - **Unicode Algorithm:** Shifts all characters based on their Unicode value.
+    - Robust error handling for missing arguments or inaccessible files.
+
 ## Key Concepts
-- **Encryption:** Converting plaintext into ciphertext.
-- **Decryption:** Converting ciphertext back into original plaintext.
-- **Key:** A parameter that determines the output of the encryption/decryption algorithm.
-- **Unicode:** Using character codes for shifting allows for a more universal encryption method that covers more than just the English alphabet.
+- **Encryption/Decryption:** Converting between plaintext and ciphertext.
+- **Key:** An integer shift value determining the transformation.
+- **Unicode vs. Alphabet Shift:** Understanding different ways to map character transformations.
+- **Command-line Arguments:** Parsing flags like `-mode`, `-key`, etc., to configure program behavior dynamically.
+- **File Handling:** Reading and writing data using `java.io.File`.
 
-## Code Snippets (Stage 3 Implementation)
+## Code Snippets (Final Implementation)
 
-### Encryption Logic
+### Argument Parsing & Main Logic
 ```kotlin
-fun encryption(message: String, key: Int) {
-    for (char in message) {
-        val shiftedChar = (char.code + key).toChar()
-        print(shiftedChar)
+fun main(args: Array<String>) {
+    var mode = "enc"
+    var key = 0
+    var data: String? = null
+    var inPath: String? = null
+    var outPath: String? = null
+    var alg = "shift"
+
+    for (i in args.indices step 2) {
+        when (args[i]) {
+            "-mode" -> mode = args[i + 1]
+            "-key" -> key = args[i + 1].toInt()
+            "-data" -> data = args[i + 1]
+            "-in" -> inPath = args[i + 1]
+            "-out" -> outPath = args[i + 1]
+            "-alg" -> alg = args[i + 1]
+        }
     }
+    // ... logic to determine data source and algorithm ...
 }
 ```
 
-### Decryption Logic
+### Shift Algorithm (Stage 6)
 ```kotlin
-fun decryption(message: String, key: Int) {
+fun shiftAlgorithm(message: String, mode: String, key: Int): String {
+    val shiftKey = if (mode == "dec") -key else key
+    val result = StringBuilder()
     for (char in message) {
-        val shiftedChar = (char.code - key).toChar()
-        print(shiftedChar)
+        when (char) {
+            in 'a'..'z' -> {
+                val shifted = (char - 'a' + shiftKey) % 26
+                val finalChar = if (shifted < 0) shifted + 26 else shifted
+                result.append(('a'.code + finalChar).toChar())
+            }
+            in 'A'..'Z' -> {
+                val shifted = (char - 'A' + shiftKey) % 26
+                val finalChar = if (shifted < 0) shifted + 26 else shifted
+                result.append(('A'.code + finalChar).toChar())
+            }
+            else -> result.append(char)
+        }
     }
+    return result.toString()
 }
 ```
 
 ## How to Run
-The program expects three lines of input:
-1. Operation (`enc` or `dec`).
-2. The message/ciphertext.
-3. The key (integer).
+The program is executed via command-line arguments:
+
+```bash
+java MainKt -mode enc -key 5 -data "Welcome to hyperskill!" -alg unicode
+```
+
+### Available Arguments:
+- `-mode`: `enc` for encryption, `dec` for decryption (default: `enc`).
+- `-key`: An integer shift value (default: `0`).
+- `-data`: The message to process.
+- `-in`: Path to a file containing the message (used if `-data` is absent).
+- `-out`: Path to a file where the result will be saved (default: print to console).
+- `-alg`: `shift` or `unicode` (default: `shift`).
